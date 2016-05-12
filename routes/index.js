@@ -3,12 +3,23 @@ var multer  = require('multer')
 var fs = require("fs")
 var upload = multer({ dest: 'uploads' })
 var router = express.Router()
+var sharedIDFactory = require('../models/sharedIDFactory.js')
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Easy Drop' })
 })
 
+
+var idCreator = new sharedIDFactory()
+
+//create the id and send it to the client
+router.get('/getnewid',function(req,res,next){
+    var newID = idCreator.getNewID()
+    console.log("New id = " + newID)
+    var response = {id:newID}
+    res.send(JSON.stringify( response ))
+})
 //can handle single file uploaded
 router.post('/upload',upload.single('file'),function(req,res){
 
@@ -20,7 +31,7 @@ router.post('/upload',upload.single('file'),function(req,res){
            if( err ){
                console.log( err );
            }else{
-               response = {
+               var response = {
                    message:'File uploaded successfully',
                    filename:req.file.originalname
                }
