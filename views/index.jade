@@ -3,8 +3,33 @@ extends layout
 block content
     h1= title
     p Welcome to #{title}
-    form(action='/upload',method='post',enctype='multipart/form-data')
-        div(data-role='fieldcontain')
-            input(id='file',type='file',name="file",size="50")
-        div(data-role='fieldcontain')
-            input(type='submit',value='Submit',data-transition='fade', data-theme='c')
+    div
+        form(action='/getsessionid.json',method='get')
+            div
+                input(type='submit',value='Get Session ID')
+    div
+        form(action='hasfile.json',method='get')
+             div
+                |sessionID:
+                input(id='checkFileSessionID',type='text',name='sessionID',size="20")
+             div
+                input(type='submit',value='Check Session ID')
+    div
+        form(action='/upload.json',method='post',enctype='multipart/form-data')
+            div
+                input(id='file',type='file',name="file",size="50")
+            div
+                |sessionID:
+                input(id='uploadFilesessionID',type='text',name='sessionID',size="20")
+            div
+                input(type='submit',value='Upload File',data-transition='fade', data-theme='c')
+    div
+        form(action='getfile',method='get')
+            div
+                |sessionID:
+                input(id='getFileSessionID',type='text',name='sessionID',size="20")
+            div
+                input(type='submit',value='Get File')
+    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
+    script(src='/javascript/script.js')
+
