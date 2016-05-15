@@ -5,28 +5,31 @@ var upload = multer({ dest: 'uploads' });
 var router = express.Router();
 var sessionIDCreator = require('../models/sessionIDCreator.js');
 var sessionTable = require('../models/sessionTable.js');
-var polling = require('async-polling');
+var asyncPolling = require('async-polling');
 
 
 var idCreator = new sessionIDCreator();
 var completedSessions = new sessionTable();
-
-
+var isPolling = false; // only call clean up routine once
+var polling = asyncPolling(function (end) {
+    console.log("-------------------------------------------\nStart cleaning up");
+    console.log("IDCreator size = " + idCreator.size());
+    console.log("completedSessions size = " + completedSessions.size());
+    idCreator.cleanUp(600); // every 10 mins
+    completedSessions.cleanUp(600);
+    console.log("After cleaning up");
+    console.log("IDCreator size = " + idCreator.size());
+    console.log("completedSessions size = " + completedSessions.size() +"\n------------------------------------");
+    end();
+    // This will schedule the next call.
+}, 600*1000);
 /* GET home page. */
 router.get('/', function(req, res, next) {
   res.render('index', { title: 'Easy Drop' });
-  polling(function (end) {
-      console.log("-------------------------------------------\nStart cleaning up");
-      console.log("IDCreator size = " + idCreator.size());
-      console.log("completedSessions size = " + completedSessions.size());
-      idCreator.cleanUp(600); // every 10 mins
-      completedSessions.cleanUp(600);
-      console.log("After cleaning up");
-      console.log("IDCreator size = " + idCreator.size());
-      console.log("completedSessions size = " + completedSessions.size() +"\n------------------------------------");
-      end();
-      // This will schedule the next call.
-  }, 600*1000).run();
+  if (!isPolling) {
+      polling.run();
+      isPolling = true;
+  }
 });
 
 

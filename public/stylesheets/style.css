@@ -14,3 +14,7 @@ a {
 #getidButton{
     background-color: #3498DB;
 }
+
+#sessionIDContainer p:nth-child(2){
+    font-size: 40px;
+}

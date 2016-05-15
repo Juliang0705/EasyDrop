@@ -2,6 +2,7 @@
  * Created by Juliang on 5/12/16.
  */
 var buckets = require('buckets-js');
+var moment = require('moment');
 
 function randomIntFromInterval(min,max)
 {
@@ -9,19 +10,21 @@ function randomIntFromInterval(min,max)
 }
 
 function Creator(){
-    this.sessionIDSet = new buckets.Set();
+    this.sessionIDSet = new buckets.Dictionary();
 }
 
 Creator.prototype.getNewSessionID = function(){
-    return (function recursiveGetNewID(creator) {
-        var id = randomIntFromInterval(1000, 10000);
-        if (creator.sessionIDSet.contains(id))
-            recursiveGetNewID();
+    var id;
+    do{
+        id = randomIntFromInterval(1000, 10000);
+        if (this.sessionIDSet.containsKey(id))
+            continue;
         else{
-            creator.sessionIDSet.add(id);
+            var timeNow = moment();
+            this.sessionIDSet.set(id,timeNow);
             return id;
         }
-    })(this);
+    }while(true);
 };
 
 Creator.prototype.size = function(){
@@ -29,11 +32,21 @@ Creator.prototype.size = function(){
 };
 
 Creator.prototype.contains = function(id){
-    return this.sessionIDSet.contains(id);
+    return this.sessionIDSet.containsKey(id);
 };
 
 Creator.prototype.remove = function(id){
     return this.sessionIDSet.remove(id);
 };
 
+Creator.prototype.cleanUp = function(timeInSeconds){
+    var self = this;
+    var timeNow = moment();
+    self.sessionIDSet.forEach(function(id,time){
+        var secondsDiff = timeNow.diff(time, 'seconds')
+        if (secondsDiff > timeInSeconds){
+            self.remove(id);
+        }
+    });
+};
 module.exports = Creator;
