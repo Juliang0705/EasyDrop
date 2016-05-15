@@ -4,13 +4,15 @@
 
 var buckets = require('buckets-js');
 var fs = require('fs');
+var moment = require('moment');
 
 function Table(){
     this.completedSessionTable = new buckets.Dictionary();
 }
 
 Table.prototype.add = function(sessionID,file){
-  this.completedSessionTable.set(sessionID,file);
+    var timeNow = moment();
+    this.completedSessionTable.set(sessionID,{file: file,time: timeNow});
 };
 
 Table.prototype.hasSession = function(sessionID){
@@ -18,13 +20,13 @@ Table.prototype.hasSession = function(sessionID){
 };
 
 Table.prototype.getFileWithSessionID = function(sessionID){
-  return this.completedSessionTable.get(sessionID);
+  return this.completedSessionTable.get(sessionID).file;
 };
 
 Table.prototype.removeSession = function (sessionID) {
     var removedFile = this.completedSessionTable.remove(sessionID);
     if (removedFile){
-        fs.unlink(removedFile.path,function(err){
+        fs.unlink(removedFile.file.path,function(err){
             if (err)
                 console.log(err);
             else
@@ -39,6 +41,17 @@ Table.prototype.removeSession = function (sessionID) {
 
 Table.prototype.size = function(){
     return this.completedSessionTable.size();
+};
+
+Table.prototype.cleanUp = function(timeInSeconds){
+    var self = this;
+    var timeNow = moment();
+    self.completedSessionTable.forEach(function(id,fileTimePair){
+        var secondsDiff = timeNow.diff(fileTimePair.time, 'seconds')
+        if (secondsDiff > timeInSeconds){
+            self.removeSession(id);
+        }
+    });
 };
 
 module.exports = Table;

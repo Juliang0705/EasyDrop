@@ -5,22 +5,59 @@ var upload = multer({ dest: 'uploads' });
 var router = express.Router();
 var sessionIDCreator = require('../models/sessionIDCreator.js');
 var sessionTable = require('../models/sessionTable.js');
-
-/* GET home page. */
-router.get('/', function(req, res, next) {
-  res.render('index', { title: 'Easy Drop' });
-});
+var polling = require('async-polling');
 
 
 var idCreator = new sessionIDCreator();
 var completedSessions = new sessionTable();
+
+
+/* GET home page. */
+router.get('/', function(req, res, next) {
+  res.render('index', { title: 'Easy Drop' });
+  polling(function (end) {
+      console.log("-------------------------------------------\nStart cleaning up");
+      console.log("IDCreator size = " + idCreator.size());
+      console.log("completedSessions size = " + completedSessions.size());
+      idCreator.cleanUp(600); // every 10 mins
+      completedSessions.cleanUp(600);
+      console.log("After cleaning up");
+      console.log("IDCreator size = " + idCreator.size());
+      console.log("completedSessions size = " + completedSessions.size() +"\n------------------------------------");
+      end();
+      // This will schedule the next call.
+  }, 600*1000).run();
+});
+
 
 //create the id and send it to the client
 router.get('/getsessionid.json',function(req,res,next){
     var newSessionID = idCreator.getNewSessionID();
     console.log("New id = " + newSessionID);
     var response = {id:newSessionID};
-    res.send(JSON.stringify( response ));
+    res.end(JSON.stringify( response ));
+});
+
+router.get('/removesessionid.json',function(req,res,next){
+    var sessionID = req.query.sessionID;
+    var response = {};
+    console.log("Remove session id " + sessionID);
+    if (sessionID){
+        idCreator.remove(sessionID);
+        completedSessions.removeSession(sessionID);
+        response = {
+            success: true,
+            id: sessionID,
+            message: "Operation succeeded"
+        };
+    }else{
+        response = {
+          success: false,
+          id: sessionID,
+          message: "sessionID is not defined"
+        };
+    }
+    res.end(JSON.stringify(response));
 });
 
 router.get('/hasfile.json',function(req,res,next){
@@ -32,18 +69,21 @@ router.get('/hasfile.json',function(req,res,next){
             response = {
                 hasFile : false,
                 id : sessionID,
+                file: null,
                 message: "Session ID doesn't exist"
             };
         }else if (completedSessions.hasSession(sessionID)){
             response = {
                 hasFile : true,
                 id : sessionID,
+                file: completedSessions.getFileWithSessionID(sessionID),
                 message: "File is ready"
             };
         }else{
             response = {
                 hasFile : false,
                 id : sessionID,
+                file: null,
                 message: "File is not ready"
             };
         }
@@ -51,6 +91,7 @@ router.get('/hasfile.json',function(req,res,next){
         response = {
             hasFile : false,
             id : sessionID,
+            file: null,
             message: "session ID missing"
         };
     }
@@ -68,8 +109,10 @@ router.get('/getfile',function(req,res,next){
             res.download(file.path,file.originalname,function(err){
                 if (err)
                     console.log(err);
-                else
+                else {
                     completedSessions.removeSession(sessionID);
+                    idCreator.remove(sessionID);
+                }
             });
         }else{
             response = {
