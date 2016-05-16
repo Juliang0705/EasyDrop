@@ -95,7 +95,12 @@ $(document).ready(function(){
         if (dynamicContainer.children().length){
             dynamicContainer.empty();
         }else {
-
+            //var fileDropZone = new Dropzone("div", { url: "http://127.0.0.1:3000/upload.json"});
+            var fileDropZone = "<form action='http://127.0.0.1:3000/upload.json' method='post' class='dz-drag-hover dz-clickable text-center' enctype='multipart/form-data' id='fileDropZone'>" +
+                "<div class='dz-message'><h5>Drop a file here or click to upload</h5></div> " +
+                "</form>";
+            dynamicContainer.append(fileDropZone);
+            var myDropzone = new Dropzone("#fileDropZone", { url: "http://127.0.0.1:3000/upload.json"});
         }
     });
 
