@@ -41,7 +41,7 @@ $(document).ready(function(){
 
     $('#receiveFileButton').on('click',function(event){
         event.preventDefault();
-        modeToggle = modeToggle === 'receive' ? 'none' : 'receive';
+        modeToggle = modeToggle === 'none' ? 'receive' : 'none';
         if (modeToggle === 'receive'){
             $(this).css('backgroundColor','#34495E');
             $('#sendFileButton').css('backgroundColor','#1ABC9C');
@@ -83,7 +83,7 @@ $(document).ready(function(){
     //send file button configuration
     $('#sendFileButton').on('click',function(event) {
         event.preventDefault();
-        modeToggle = modeToggle === 'send' ? 'none' : 'send';
+        modeToggle = modeToggle === 'none' ? 'send' : 'none';
         if (modeToggle === 'send'){
             $(this).css('backgroundColor','#34495E');
             $('#receiveFileButton').css('backgroundColor','#1ABC9C');
@@ -96,13 +96,34 @@ $(document).ready(function(){
             dynamicContainer.empty();
         }else {
             //var fileDropZone = new Dropzone("div", { url: "http://127.0.0.1:3000/upload.json"});
-            var fileDropZone = "<form action='http://127.0.0.1:3000/upload.json' method='post' class='dz-drag-hover dz-clickable text-center' enctype='multipart/form-data' id='fileDropZone'>" +
+            var fileDropZone = "<form action='http://127.0.0.1:3000/upload.json' method='post' class='dropzone dz-drag-hover dz-clickable dz-preview dz-file-preview dz-image-preview dz-details dz-size dz-filename dz-remove dz-image dz-processing dz-progress dz-complete dz-error dz-success-mark dz-error-mark text-center' enctype='multipart/form-data' id='dropzone'>" +
                 "<div class='dz-message'><h5>Drop a file here or click to upload</h5></div> " +
                 "</form>";
             dynamicContainer.append(fileDropZone);
-            var myDropzone = new Dropzone("#fileDropZone", { url: "http://127.0.0.1:3000/upload.json"});
+            var myDropzone = new Dropzone("#dropzone",
+                {   maxFiles:1,
+                    addRemoveLinks: true,
+                    init: function() {
+                    },
+                    maxfilesexceeded: function(file){
+                        this.removeAllFiles();
+                        this.addFile(file);
+                    },
+                    success:function(file,response){
+                        console.log("Success: " + response);
+                        json = JSON.parse(response);
+                        //if (json.success){
+                        //    $("#dropzone").addClass("dz-success");
+                        //}else{
+                        //    $("#dropzone").addClass("dz-error");
+                        //}
+                    },
+                    error: function(file,response){
+                        console.log("Error happened: " + response);
+                    }
+
+                });
         }
     });
-
     $('[data-toggle="tooltip"]').tooltip();
 });

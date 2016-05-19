@@ -19,6 +19,9 @@ a {
     font-size: 40px;
 }
 
-#fileDropZone{
-    border: dashed 5px blue;
+#dropzone{
+    border: dashed 5px #3498DB;
 }
+/*#fileDropZone{*/
+    /*border: dashed 5px blue;*/
+/*}*/
