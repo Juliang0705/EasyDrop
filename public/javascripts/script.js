@@ -96,7 +96,8 @@ $(document).ready(function(){
             dynamicContainer.empty();
         }else {
             //var fileDropZone = new Dropzone("div", { url: "http://127.0.0.1:3000/upload.json"});
-            var fileDropZone = "<form action='http://127.0.0.1:3000/upload.json' method='post' class='dropzone dz-drag-hover dz-clickable dz-preview dz-file-preview dz-image-preview dz-details dz-size dz-filename dz-remove dz-image dz-processing dz-progress dz-complete dz-error dz-success-mark dz-error-mark text-center' enctype='multipart/form-data' id='dropzone'>" +
+            var fileDropZone = "<form action='http://127.0.0.1:3000/upload.json' method='post' class='dropzone dz-drag-hover dz-clickable dz-preview dz-file-preview dz-image-preview dz-details dz-size dz-filename dz-remove dz-image dz-processing dz-progress dz-complete dz-error dz-success-mark dz-error-mark text-center defaultDropZoneBorder' enctype='multipart/form-data' id='dropzone'>" +
+                "<input type='text' placeholder='Enter Session ID' name='sessionID' size='50' class='form-control input-hg' id='sessionIDInput'/>"+
                 "<div class='dz-message'><h5>Drop a file here or click to upload</h5></div> " +
                 "</form>";
             dynamicContainer.append(fileDropZone);
@@ -110,16 +111,23 @@ $(document).ready(function(){
                         this.addFile(file);
                     },
                     success:function(file,response){
-                        console.log("Success: " + response);
+                        console.log(response);
                         json = JSON.parse(response);
-                        //if (json.success){
-                        //    $("#dropzone").addClass("dz-success");
-                        //}else{
-                        //    $("#dropzone").addClass("dz-error");
-                        //}
+                        var dropzone = $("#dropzone");
+                        dropzone.removeClass("defaultDropZoneBorder");
+                        if (json.success){
+                            dropzone.addClass("has-success");
+                        }else{
+                            dropzone.addClass("has-error");
+                        }
+                        $("#sessionIDInput").attr("placeholder",json.message);
                     },
                     error: function(file,response){
                         console.log("Error happened: " + response);
+                        var dropzone = $("#dropzone");
+                        dropzone.removeClass("defaultDropZoneBorder");
+                        dropzone.addClass("has-error");
+                        $("#sessionIDInput").attr("placeholder",response);
                     }
 
                 });

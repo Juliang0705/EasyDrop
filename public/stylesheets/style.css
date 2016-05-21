@@ -18,9 +18,21 @@ a {
 #sessionIDContainer p:nth-child(2){
     font-size: 40px;
 }
+#sessionIDInput{
+    text-align: center;
+}
+.defaultDropZoneBorder{
+    border: dashed 3px #3498DB;
+    border-radius: 10px;
+}
+.has-success{
+    border: solid 3px #2ECC71;
+    border-radius: 10px;
+}
 
-#dropzone{
-    border: dashed 5px #3498DB;
+.has-error{
+    border: solid 3px #E74C3C;
+    border-radius: 10px;
 }
 /*#fileDropZone{*/
     /*border: dashed 5px blue;*/
