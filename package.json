@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/EasyDropServer"
+    "start": "node ./bin/EasyDropServer.js"
   },
   "dependencies": {
     "body-parser": "~1.13.2",
