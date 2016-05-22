@@ -1,1 +1,1 @@
-web: node /bin/EasyDropServer.js
+web: node ./bin/EasyDropServer.js
