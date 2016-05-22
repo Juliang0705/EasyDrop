@@ -1,35 +1,23 @@
 extends layout
 
 block content
-    h1= title
-    p Welcome to #{title}
-    div
-        form(action='/getsessionid.json',method='get')
-            div
-                input(type='submit',value='Get Session ID')
-    div
-        form(action='hasfile.json',method='get')
-             div
-                |sessionID:
-                input(id='checkFileSessionID',type='text',name='sessionID',size="20")
-             div
-                input(type='submit',value='Check Session ID')
-    div
-        form(action='/upload.json',method='post',enctype='multipart/form-data')
-            div
-                input(id='file',type='file',name="file",size="50")
-            div
-                |sessionID:
-                input(id='uploadFilesessionID',type='text',name='sessionID',size="20")
-            div
-                input(type='submit',value='Upload File',data-transition='fade', data-theme='c')
-    div
-        form(action='getfile',method='get')
-            div
-                |sessionID:
-                input(id='getFileSessionID',type='text',name='sessionID',size="20")
-            div
-                input(type='submit',value='Get File')
-    script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js')
-    script(src='/javascript/script.js')
-
+    body
+        #mainContainer.container-fluid
+            .row
+                .col-lg-6.col-lg-offset-3.text-center
+                    h1 Easy Drop
+            // Two buttons to choose modes
+            #mode.row
+                .col-lg-6.col-lg-offset-3.text-center
+                    button#sendFileButton.btn.btn-hg.btn-primary(data-toggle='tooltip', title='Click me if you want to send a file to others')
+                        | &nbsp&nbspSend File&nbsp&nbsp
+                    button#receiveFileButton.btn.btn-hg.btn-primary(data-toggle='tooltip', title='Click me if you want to request a file from others')
+                        | Receive File
+            #dynamicContainer.container-fluid
+        // /.container
+        // jQuery (necessary for Flat UI's JavaScript plugins)
+        script(src='/FlatUI/dist/js/vendor/jquery.min.js')
+        script(src='/FlatUI/dist/js/vendor/video.js')
+        script(src='/FlatUI/dist/js/flat-ui.min.js')
+        script(src='/javascripts/async-polling.min.js')
+        script(src='/javascripts/script.js')

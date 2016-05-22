@@ -9,14 +9,14 @@ var polling = AsyncPolling(function(end){
     if (id.length){
         //console.log(data);
         $.ajax({
-            url: 'http://127.0.0.1:3000/hasfile.json',
+            url: 'hasfile.json',
             type:'GET',
             data:"sessionID="+id.text(),
             dataType:'JSON',
             success:function(json){
                 if (json.hasFile){
                     $('#downloadButton').remove();
-                    var downloadForm = "<form action='http://127.0.0.1:3000/getfile' method='get'>" +
+                    var downloadForm = "<form action='getfile' method='get'>" +
                        " <Button type='submit' value='" + id.text() + "' class='btn btn-hg btn-success' name='sessionID' id='downloadButton'>Download</Button>" +
                         "</form>";
                     $('#sessionIDContainer').append(downloadForm);
@@ -63,7 +63,7 @@ $(document).ready(function(){
                     sessionIDContainer.remove();
                 }
                 $.ajax({
-                    url: 'http://127.0.0.1:3000/getsessionid.json',
+                    url: 'getsessionid.json',
                     type: 'GET',
                     dataType: 'JSON',
                     success: function (json) {
@@ -95,8 +95,7 @@ $(document).ready(function(){
         if (dynamicContainer.children().length){
             dynamicContainer.empty();
         }else {
-            //var fileDropZone = new Dropzone("div", { url: "http://127.0.0.1:3000/upload.json"});
-            var fileDropZone = "<form action='http://127.0.0.1:3000/upload.json' method='post' class='dropzone dz-drag-hover dz-clickable dz-preview dz-file-preview dz-image-preview dz-details dz-size dz-filename dz-remove dz-image dz-processing dz-progress dz-complete dz-error dz-success-mark dz-error-mark text-center defaultDropZoneBorder' enctype='multipart/form-data' id='dropzone'>" +
+            var fileDropZone = "<form action='upload.json' method='post' class='dropzone dz-drag-hover dz-clickable dz-preview dz-file-preview dz-image-preview dz-details dz-size dz-filename dz-remove dz-image dz-processing dz-progress dz-complete dz-error dz-success-mark dz-error-mark text-center defaultDropZoneBorder' enctype='multipart/form-data' id='dropzone'>" +
                 "<input type='text' placeholder='Enter Session ID' name='sessionID' size='50' class='form-control input-hg' id='sessionIDInput'/>"+
                 "<div class='dz-message'><h5>Drop a file here or click to upload</h5></div> " +
                 "</form>";
@@ -120,17 +119,26 @@ $(document).ready(function(){
                         }else{
                             dropzone.addClass("has-error");
                         }
-                        $("#sessionIDInput").attr("placeholder",json.message);
+                        var message = "<div class='serverResponse'><h4>"+json.message+"</h4></div>";
+                        dropzone.append(message);
                     },
                     error: function(file,response){
                         console.log("Error happened: " + response);
                         var dropzone = $("#dropzone");
                         dropzone.removeClass("defaultDropZoneBorder");
                         dropzone.addClass("has-error");
-                        $("#sessionIDInput").attr("placeholder",response);
+                        var message = "<div class='serverResponse'><h4>"+response+"</h4></div>";
+                        dropzone.append(message);
                     }
 
                 });
+            $("#dropzone").on('click',function(event){
+                $(".serverResponse").remove();
+                var dropzone =  $("#dropzone");
+                dropzone.removeClass("has-success");
+                dropzone.removeClass("has-error");
+                dropzone.addClass("defaultDropZoneBorder");
+            });
         }
     });
     $('[data-toggle="tooltip"]').tooltip();
